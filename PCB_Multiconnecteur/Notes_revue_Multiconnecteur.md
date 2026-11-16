@@ -1,30 +1,46 @@
-# Multiconnecteur du banc d’essai Zénith
-Version pour revue du 15 novembre 2026. Ouvrir `PCB/BT_Multiconnecteur.PrjPcb`. Les documents et les empreintes utilisés sont inclus. Le projet conserve les références au dépôt commun de l’équipe dans son emplacement habituel.
+# Multiconnecteur du banc d'essai Zénith — revue avant commande
 
-## Connecteurs et brochage
+Version 2 du 16 novembre 2026, après les réponses de Fey. Ouvrir `PCB/BT_Multiconnecteur.PrjPcb`. Les librairies sont dans `PCB/Libs/` et le modèle 3D dans `CAD/BT_Multiconnecteur.step`.
+
+## Ce qui a changé depuis la v1
+
+- **Quatre trous de fixation M3** (3,2 mm, non métallisés) en (4 ; 56), (86 ; 56), (22 ; 4) et (68 ; 4) mm depuis le coin inférieur gauche. Les coins du bas sont occupés par les MR30, alors les deux trous du bas sont décalés vers le centre. Ces positions sont provisoires, puisque la fixation du banc va changer.
+- **Courant confirmé :** 80 A / 3, soit au plus 26,7 A par fil et par connexion. La section « Tenue en courant » est mise à jour en conséquence.
+
+## La carte
+
+- 90 × 60 mm, deux couches de cuivre 2 oz (70 µm).
+- Trois nets : PHASE_A, PHASE_B et PHASE_C. Côté ESC à gauche, côté moteur à droite.
+- Chaque phase a un polygone sur le dessus et un sur le dessous, reliés par 18 vias.
+- Les connecteurs d'un même côté sont en parallèle. Une phase alimentée est donc aussi présente sur les connecteurs inutilisés (capuchons à prévoir).
 
 | Connexion | Côté ESC | Côté moteur | Affectation |
 |---|---|---|---|
-| WAGO 2716-103 | J1, dessous | J6, dessus | Les quatre contacts L1.x rejoignent A, L2.x rejoignent B et L3.x rejoignent C |
-| Amass MR30 coudé | J2, mâle, dessus | J7, femelle, dessous | 1 = A, 2 = B, 3 = C. Les deux ergots MH sont isolés |
-| Bullets 5,5 mm, dessus | J3, J4, J5, mâles proposés | J8, J9, J10, femelles proposées | A, B, C dans l’ordre indiqué |
+| WAGO 2716-103 (levier) | J1, monté dessous | J6, dessus | L1.x = A, L2.x = B, L3.x = C |
+| Amass MR30 coudé | J2, mâle, dessus | J7, femelle, monté dessous | 1 = A, 2 = B, 3 = C, ergots MH sans net |
+| Bullets 5,5 mm | J3, J4, J5 (mâles) | J8, J9, J10 (femelles) | A, B, C de haut en bas |
 
-Les connecteurs d’un même côté sont câblés en parallèle. Une phase alimentée est présente également sur ses connecteurs inutilisés. Les genres réels et les capuchons doivent être confirmés par l’équipe.
+J1 et J7 sont sous la carte pour garder l'ordre A-B-C aligné des deux côtés sans croiser les phases. La carte se monte donc sur entretoises, avec un accès par en dessous. Le WAGO J1 descend de 28,8 mm sous la carte : les entretoises doivent faire au moins 30 mm.
 
-## Vérifications effectuées
+## Tenue en courant (26,7 A par phase)
 
-- Relecture des symboles et du PCB avec un importeur indépendant. Comparaison du schéma avec les pads du PCB après import. Les 36 connexions concordent, avec 12 par phase. Les quatre ergots MR30 restent sans net.
-- Contrôle géométrique du PCB importé avec KiCad 9.0.2. Zéro court-circuit signalé et zéro pad à relier. Dix avertissements concernent la recherche des bibliothèques Altium dans la table de bibliothèques de KiCad.
-- Six polygones remplis, un par phase sur chaque face, et 54 vias de liaison. La distance minimale entre les contours des grands polygones de phases différentes est de 2,34 mm. Les pistes vers les MR30 suivent un chemin distinct des trois liaisons principales.
-- Le STEP de la carte nue s’ouvre en un solide de 90 × 60 × 1,6 mm. Le montage est proposé sur deux faces. Les volumes des connecteurs, des fiches, des leviers et du support restent à vérifier.
+- **Polygones :** le passage le plus étroit fait 7,5 mm sur chaque face, en 2 oz, avec les deux faces en parallèle. D'après l'IPC-2221, l'échauffement est d'environ +10 °C à 26,7 A.
+- **WAGO 2716-103 :** donné pour 76 A (IEC) et 55 A (UL), donc largement suffisant.
+- **Bullets 5,5 mm :** suffisants pour ce courant.
+- **MR30 :** donné pour 15 A en continu (30 A pendant 1 min). Le chemin MR30 reste réservé aux moteurs qui tirent au plus 15 A par phase. Ses pistes (1,45 mm sur les deux faces) tiennent environ 10 à 14 A ; il faudrait les élargir à environ 2,5 mm pour profiter des 15 A du connecteur.
 
-## Décisions avant fabrication ou essai
+## Vérifications faites dans Altium 26.10.1
 
-1. Préciser si 80 A nominal et 100 A crête désignent le courant batterie ou le courant de phase, sa valeur efficace, la durée de pointe et le cycle des essais.
-2. Choisir un connecteur et un renfort dont le calibre convient au chemin fort courant. La fiche WAGO 2716-103 donne 76 A selon l’IEC et 55 A pour les groupes UL B/C. Confirmer aussi le calibre de chaque paire de bullets et la limite du chemin MR30 complet. Les pistes, vias et fenêtres de masque de cette version ne constituent pas une qualification 80–100 A.
-3. Dimensionner le renfort de chaque phase, ses raccords aux connecteurs et ses points de soudure. Les ouvertures de masque centrales sont provisoires. Confirmer le cuivre fini de 70 µm par face, la métallisation et la tenue thermique du trajet complet.
-4. Mesurer la partie à souder des bullets réels avant de retenir le perçage actuel de 7,2 mm. Vérifier les plans constructeur et l’accouplement réel des MR30PW-M et MR30PW-FB. Confirmer le repérage des phases en regardant la face d’accouplement de chaque connecteur.
-5. Confirmer l’accès sous le circuit au WAGO J1 et au MR30 J7, le dégagement du câblage et les points de fixation du banc. Les trous de montage M3 restent à positionner avec le châssis.
-6. Ouvrir le projet dans Altium 26, valider le schéma, contrôler les changements proposés lors de la synchronisation vers le PCB, recalculer les polygones et lancer le DRC natif avant de générer les fichiers de fabrication.
+- Validate PCB Project : 0 erreur.
+- Schéma et PCB synchronisés.
+- DRC : 0 violation, 0 avertissement, avec les trous de fixation.
 
-Fiche constructeur du bornier WAGO 2716-103 : https://www.wago.com/2716-103
+## À valider avant de commander
+
+1. **Bullets :** mesurer nos vrais bullets au pied à coulisse. Le perçage de 7,2 mm vient d'une fiche générique.
+2. **Fixation :** positions finales des trous M3 selon le nouveau montage du banc, et entretoises d'au moins 30 mm.
+3. **MR30 :** confirmer qu'on se limite aux petits moteurs sur ce chemin, ou élargir ses pistes.
+4. **Genres réels** des bullets et des MR30 avec les câbles de l'ESC et des moteurs, et capuchons pour les connecteurs inutilisés.
+5. Petit détail : l'empreinte des bullets s'appelle encore `_5.5`, à renommer.
+
+Fiche du bornier WAGO 2716-103 : https://www.wago.com/2716-103
